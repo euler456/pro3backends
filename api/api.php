@@ -15,9 +15,10 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 $request = Request::createFromGlobals();
-$response = new Response();
 echo ("hrllo");
 die;
+$response = new Response();
+
 
 $session = new Session(new NativeSessionStorage(), new AttributeBag());
 
