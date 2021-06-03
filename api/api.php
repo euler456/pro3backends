@@ -32,10 +32,11 @@ if (!$session->has('sessionObj')) {
 }
 
 
-if (strpos($request->headers->get('referer'), "localhost") == true) {
+if (strpos($request->headers->get('referer'), "proj3backends") == true) {
     $originPass = true; 
 } else { 
     $response->setStatusCode(403);
+    echo("ss");
     $response->send();
     return;
 }
