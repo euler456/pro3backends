@@ -13,13 +13,12 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-
+echo ("hrllo");
+die;
 $request = Request::createFromGlobals();
 echo ("hrllo");
 die;
 $response = new Response();
-
-
 $session = new Session(new NativeSessionStorage(), new AttributeBag());
 
 $response->headers->set('Content-Type', 'application/json');
