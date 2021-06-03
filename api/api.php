@@ -1,5 +1,5 @@
 <?php
-
+echo("hello");
 require_once('../vendor/autoload.php');
 require_once('./se.php');
 require_once('./userfunction.php');
