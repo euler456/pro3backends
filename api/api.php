@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 $request = Request::createFromGlobals();
 $response = new Response();
 $session = new Session(new NativeSessionStorage(), new AttributeBag());
-echo $dbURI;
+echo ("hrllo");
 die;
 
 $response->headers->set('Content-Type', 'application/json');
