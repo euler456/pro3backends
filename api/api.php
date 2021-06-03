@@ -24,6 +24,8 @@ $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE,
 $response->headers->set('Access-Control-Allow-Origin', 'https://proj3backends.herokuapp.com');
 $response->headers->set('Access-Control-Allow-Credentials', 'true');
 //put session here because here is the place the action started
+echo $dbURI;
+die;
 ini_set('session.cookie_samesite',"None");
 ini_set('session.cookie_secure', "1");
 $session->start();
