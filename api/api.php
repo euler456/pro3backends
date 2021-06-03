@@ -28,7 +28,8 @@ $response->headers->set('Access-Control-Allow-Credentials', 'true');
 ini_set('session.cookie_samesite',"None");
 ini_set('session.cookie_secure', "1");
 $session->start();
-
+echo("fff");
+die;
 if (!$session->has('sessionObj')) {
     $session->set('sessionObj', new sqsSession);
 }
