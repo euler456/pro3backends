@@ -6,7 +6,8 @@ require_once('./userfunction.php');
 
 //sqsuser is from the userfunction.php which represent database
 $sqsdb = new sqsuser;
-
+echo("hello");
+die;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -27,8 +28,7 @@ $response->headers->set('Access-Control-Allow-Credentials', 'true');
 ini_set('session.cookie_samesite',"None");
 ini_set('session.cookie_secure', "1");
 $session->start();
-echo("hello");
-die;
+
 if (!$session->has('sessionObj')) {
     $session->set('sessionObj', new sqsSession);
 }
