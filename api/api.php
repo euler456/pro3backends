@@ -20,7 +20,7 @@ $originPass= false;
 $response->headers->set('Content-Type', 'application/json');
 $response->headers->set('Access-Control-Allow-Headers', 'origin, content-type, accept');
 $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-$response->headers->set('Access-Control-Allow-Origin', 'http://localhost/');
+$response->headers->set('Access-Control-Allow-Origin', 'https://proj3backends.herokuapp.com');
 $response->headers->set('Access-Control-Allow-Credentials', 'true');
 //put session here because here is the place the action started
 ini_set('session.cookie_samesite',"None");
