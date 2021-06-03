@@ -4,6 +4,7 @@ require_once('../vendor/autoload.php');
 require_once('./se.php');
 require_once('./userfunction.php');
 echo("hello");
+die;
 //sqsuser is from the userfunction.php which represent database
 $sqsdb = new sqsuser;
 
