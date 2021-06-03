@@ -1,5 +1,5 @@
 {
     "require": {
-        "symfony/dotenv": "^3.4"
+        "symfony/http-foundation": "^5.2"
     }
 }

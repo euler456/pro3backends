@@ -2,20 +2,32 @@
 
 class sqsuser
 {
+
     private $dbconn;
 
     public function __construct()
     {
-    //here to connect the database in the computer
-    $dbURI = 'mysql:host=' . 'us-cdbr-east-04.cleardb.com' . ';port=3306;dbname=' . 'heroku_be04d0b5c2244ab';
-    $this->dbconn = new PDO($dbURI, 'b48b00a18bfa2e', '1964f939');
-   $this->dbconn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-   
+     //here to connect the database in the computer
+        $dbURI = 'mysql:host=' . 'us-cdbr-east-04.cleardb.com' . ';port=3306;dbname=' . 'heroku_be04d0b5c2244ab';
+
+        $this->dbconn = new PDO($dbURI, 'b48b00a18bfa2e', '1964f939');
+       $this->dbconn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+      
+       // $cleardb_url = parse_url(getenv("mysql://b48b00a18bfa2e:1964f939@us-cdbr-east-04.cleardb.com/heroku_be04d0b5c2244ab?reconnect=true"));
+//$cleardb_server = $cleardb_url["us-cdbr-east-04.cleardb.com"];
+//$cleardb_username = $cleardb_url["b48b00a18bfa2e"];
+//$cleardb_password = $cleardb_url["1964f939"];
+//$cleardb_db = substr($cleardb_url["heroku_be04d0b5c2244ab"],1);
+//$active_group = 'default';
+//$query_builder = TRUE;
+// Connect to DB
+
+
     }
 
     function checkLogin($u, $p)
     {
-    // Return uid if user/password tendered are correct otherwise 0
+        // Return uid if user/password tendered are correct otherwise 0
         $sql = "SELECT * FROM customer WHERE username = :username";
         $stmt = $this->dbconn->prepare($sql);
         $stmt->bindParam(':username', $u, PDO::PARAM_STR);
@@ -23,15 +35,13 @@ class sqsuser
         if ($stmt->rowCount() > 0) {
             $retVal = $stmt->fetch(PDO::FETCH_ASSOC);
             if (strlen($retVal['password']) > 0) {
-                //only usertype is admin can login admin panel
-                if ($retVal['password'] ==MD5($p) && $retVal['usertype'] == 'admin') { 
+                if ($retVal['password'] == $p) { // encrypt & decrypt
                     return array(
                         'CustomerID' => $retVal['CustomerID'],
                         'username' => $retVal['username'],
                         'email' => $retVal['email'],
                         'phone' => $retVal['phone'],
-                        'postcode' => $retVal['postcode'],
-                        'usertype' => $retVal['usertype']
+                        'postcode' => $retVal['postcode']
                     );
                 } else {
                     return false;
@@ -66,15 +76,22 @@ class sqsuser
     }
     function registerUser( $username, $email, $phone, $postcode, $password)
     {
-      
-        $sql = "INSERT INTO customer (username,email,phone,postcode,password,usertype)  
-        VALUES (:username,:email, :phone,:postcode,MD5(:password),'admin');";
+        // Retister user into system, assume validation has happened.
+        // return UID created or false if fail
+        //            $sql = "UPDATE customer SET Username = :Username, Pass = :Pass, Email = :Email, Phone = :Phone=1 WHERE CustomerID = :CustomerID";
+
+        //            $lastCustID = $this->dbconn->lastInsertID();
+
+        //            $sql = "INSERT INTO customer(CustomerID,Username,Pass,Email,Phone)  VALUES (:CustomerID,:Username,:Pass,:Email, :Phone)";
+        $sql = "INSERT INTO customer (username,email,phone,postcode,password,usertype)  VALUES (:username,:email, :phone,:postcode,:password,'user');";
         $stmt = $this->dbconn->prepare($sql);
+        //            $stmt->bindParam(':CustomerID', $lastCustID, PDO::PARAM_INT);
         $stmt->bindParam(':username', $username, PDO::PARAM_STR);
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->bindParam(':phone', $phone, PDO::PARAM_INT);
         $stmt->bindParam(':postcode', $postcode, PDO::PARAM_INT);
         $stmt->bindParam(':password', $password, PDO::PARAM_STR);
+
         $result = $stmt->execute();
         if ($result === true) {
             return true;
@@ -82,10 +99,20 @@ class sqsuser
             return false;
         }
     }
+
     function updateprofile($CustomerID, $username, $email, $phone, $postcode, $password)
     {
-        $sql = "UPDATE customer SET username = :username,password = :password , email = :email, phone = :phone, postcode = :postcode WHERE  CustomerID= :CustomerID";
+        // Retister user into system, assume validation has happened.
+        // return UID created or false if fail
+        //            $sql = "UPDATE customer SET Username = :Username, Pass = :Pass, Email = :Email, Phone = :Phone=1 WHERE CustomerID = :CustomerID";
+
+        //            $lastCustID = $this->dbconn->lastInsertID();
+
+        //            $sql = "INSERT INTO customer(CustomerID,Username,Pass,Email,Phone)  VALUES (:CustomerID,:Username,:Pass,:Email, :Phone)";
+        // $currentuserid = "SELECT CustomerID FROM customer WHERE username = '$username'";
+        $sql = "UPDATE customer SET username = :username,password = :password , email = :email, phone = :phone, postcode = :postcode WHERE CustomerID = :CustomerID";
         $stmt = $this->dbconn->prepare($sql);
+        //            $stmt->bindParam(':CustomerID', $lastCustID, PDO::PARAM_INT);
         $stmt->bindParam(':CustomerID', $CustomerID, PDO::PARAM_INT);
         $stmt->bindParam(':username', $username, PDO::PARAM_STR);
         $stmt->bindParam(':password', $password, PDO::PARAM_STR);
@@ -99,16 +126,15 @@ class sqsuser
             return false;
         }
     }
-    function logevent($CustomerID,$action)
+    function logevent($CustomerID, $ip_addr,$action,$PHPSESSID)
     {
-        $ip = $_SERVER['REMOTE_ADDR'];     
-        $sql = "INSERT INTO logtable ( CustomerID ,ip_addr, action ,usertype) 
-                VALUES (:CustomerID,:ip,:action,'admin');";
+        $sql = "INSERT INTO logtable (CustomerID ,ip_addr, action ,usertype,PHPSESSID) 
+                VALUES (:CustomerID,:ip_addr,:action,'user',:PHPSESSID);";
         $stmt = $this->dbconn->prepare($sql);
         $stmt->bindParam(':CustomerID', $CustomerID, PDO::PARAM_INT);
-     
+        $stmt->bindParam(':ip_addr',  $ip_addr , PDO::PARAM_INT);
         $stmt->bindParam(':action', $action, PDO::PARAM_STR);
-        $stmt->bindParam(':ip',  $ip , PDO::PARAM_INT);
+        $stmt->bindParam(':PHPSESSID', $PHPSESSID, PDO::PARAM_STR);
         $result = $stmt->execute();
         if ($result === true) {
             return true;
@@ -118,12 +144,12 @@ class sqsuser
     }
     function displayorderfood()
     {
-
         $sql = "SELECT * FROM food";
         $stmt = $this->dbconn->prepare($sql);
         $stmt->execute();
-        $result = $stmt->fetchAll();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         exit(json_encode($result));
+       
     }
     function sumtotalpriceff($CustomerID)
     {
@@ -171,11 +197,6 @@ class sqsuser
     }
     function displayfood()
     {
-        /*$dbhost = 'localhost:3307';
-            $dbuser = 'root';
-            $dbpass = '';
-            $db     = 'proj2';*/
-
         $sql = "SELECT * FROM food";
         $stmt = $this->dbconn->prepare($sql);
         $stmt->execute();
@@ -186,61 +207,12 @@ class sqsuser
 
         exit(json_encode($result));
     }
-    function addfooditem($foodname, $price, $description, $options, $image)
-    {
-
-        $sql = "INSERT INTO food (foodname,price,description,options,image)  VALUES (:foodname,:price,:description,:options,:image);";
-        $stmt = $this->dbconn->prepare($sql);
-        //  $stmt->bindParam(':F_ID', $F_ID, PDO::PARAM_INT);   
-        $stmt->bindParam(':foodname', $foodname, PDO::PARAM_STR);
-        $stmt->bindParam(':price', $price, PDO::PARAM_INT);
-        $stmt->bindParam(':description', $description, PDO::PARAM_STR);
-        $stmt->bindParam(':options', $options, PDO::PARAM_STR);
-        $stmt->bindParam(':image', $image, PDO::PARAM_STR);
-        $result = $stmt->execute();
-        if ($result === true) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    function deletefood($F_ID)
-    {
-        $sql = "DELETE FROM food where F_ID = :F_ID;";
-        $stmt = $this->dbconn->prepare($sql);
-        $stmt->bindParam(':F_ID',$F_ID, PDO::PARAM_INT);
-        $result = $stmt->execute();
-        if ($result === true) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    function updatefooditem($F_ID, $foodname, $price, $description, $options, $image)
-    {
-
-        $sql = "UPDATE food SET foodname = :foodname,price = :price , description = :description, options = :options, image = :image WHERE F_ID = :F_ID";
-        $stmt = $this->dbconn->prepare($sql);
-        $stmt->bindParam(':F_ID', $F_ID, PDO::PARAM_INT);
-        $stmt->bindParam(':foodname', $foodname, PDO::PARAM_STR);
-        $stmt->bindParam(':price', $price, PDO::PARAM_INT);
-        $stmt->bindParam(':description', $description, PDO::PARAM_STR);
-        $stmt->bindParam(':options', $options, PDO::PARAM_STR);
-        $stmt->bindParam(':image', $image, PDO::PARAM_STR);
-        $result = $stmt->execute();
-        if ($result === true) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+   
     function createorderform($CustomerID)
     {
         $sql = "INSERT INTO orderform (orderstatus,CustomerID,totalprice)  VALUES ('Notpayed',:CustomerID,'0');";
         $stmt = $this->dbconn->prepare($sql);
-        // $stmt->bindParam(':orderstatus', $orderstatus, PDO::PARAM_STR);
         $stmt->bindParam(':CustomerID', $CustomerID, PDO::PARAM_INT);
-        // $stmt->bindParam(':totalprice', $totalprice, PDO::PARAM_INT);   
         $result = $stmt->execute();
         if ($result === true) {
             return true;
@@ -253,7 +225,6 @@ class sqsuser
 
         $sql = "INSERT INTO orderitem (F_ID,foodname,price,quantity,totalprice,orderID)  VALUES (:F_ID,:foodname,:price,:quantity,:totalprice,(SELECT max(orderID) orderID FROM orderform where CustomerID= :CustomerID ));";
         $stmt = $this->dbconn->prepare($sql);
-        //  $stmt->bindParam(':F_ID', $F_ID, PDO::PARAM_INT);  
         $stmt->bindParam(':F_ID', $F_ID, PDO::PARAM_INT);
         $stmt->bindParam(':foodname', $foodname, PDO::PARAM_STR);
         $stmt->bindParam(':price', $price, PDO::PARAM_INT);
@@ -310,61 +281,5 @@ class sqsuser
     }
 
 
-//============================ Control user function===================================
 
-function userdisplay()
-{
-    $sql = "SELECT * FROM customer WHERE usertype ='user'";
-    $stmt = $this->dbconn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->fetchAll();
-        exit(json_encode($result));
-}
-function useradd($username, $email, $phone, $postcode, $password,$usertype)
-{
-    $sql = "INSERT INTO customer (username,email,phone,postcode,password,usertype)  VALUES (:username,:email, :phone,:postcode,:password,:usertype);";
-        $stmt = $this->dbconn->prepare($sql);
-        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
-        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-        $stmt->bindParam(':phone', $phone, PDO::PARAM_INT);
-        $stmt->bindParam(':postcode', $postcode, PDO::PARAM_INT);
-        $stmt->bindParam(':password', $password, PDO::PARAM_STR);
-        $stmt->bindParam(':usertype', $usertype, PDO::PARAM_STR);
-        $result = $stmt->execute();
-        if ($result === true) {
-            return true;
-        } else {
-            return false;
-        }
-}
-function userdelete($CustomerID)
-{
-    $sql = "DELETE FROM customer where CustomerID = :CustomerID;";
-    $stmt = $this->dbconn->prepare($sql);
-    $stmt->bindParam(':CustomerID', $CustomerID, PDO::PARAM_INT);
-    $result = $stmt->execute();
-    if ($result === true) {
-        return true;
-    } else {
-        return false;
-    }
-}
-function userupdate($CustomerID, $username, $email, $phone, $postcode, $password,$usertype)
-{
-    $sql = "UPDATE customer SET username = :username,password = :password , email = :email, phone = :phone, postcode = :postcode ,usertype=:usertype WHERE CustomerID = :CustomerID";
-        $stmt = $this->dbconn->prepare($sql);
-        $stmt->bindParam(':CustomerID', $CustomerID, PDO::PARAM_INT);
-        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
-        $stmt->bindParam(':password', $password, PDO::PARAM_STR);
-        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-        $stmt->bindParam(':phone', $phone, PDO::PARAM_INT);
-        $stmt->bindParam(':postcode', $postcode, PDO::PARAM_INT);
-        $stmt->bindParam(':usertype', $usertype, PDO::PARAM_STR);
-        $result = $stmt->execute();
-        if ($result === true) {
-            return true;
-        } else {
-            return false;
-        }
-}
 }

@@ -16,7 +16,7 @@ class sqsSession
 
     public function __construct()
     {
-        $this->origin = 'https://proj3backends.herokuapp.com';
+        $this->origin = 'https://ux2website.herokuapp.com';
     }
     public function is_rate_limited()
     {
@@ -60,7 +60,6 @@ class sqsSession
                 'username' => $res['username'],
                 'email' => $res['email'],
                 'phone' => $res['phone'],
-                'usertype' => $res['usertype'],
                 'Hash' => $this->user_token
             );
         } elseif (count($res) == 1) {
@@ -69,7 +68,7 @@ class sqsSession
             return array('Hash' => $this->user_token);
         }
     }
-    public function register($username, $email, $phone, $postcode, $password)
+    public function register($username, $email, $phone, $postcode, $password, $csrf)
     {
         global $sqsdb;
         if ($sqsdb->registerUser( $username,  $email, $phone, $postcode, $password)) {
@@ -82,6 +81,16 @@ class sqsSession
     {
         global $sqsdb;
         if ($sqsdb->updateprofile($this->CustomerID, $username,  $email, $phone, $postcode, $password)) {
+            return true;
+        } else {
+            return 0;
+        }
+    }
+    public function logEvent($ip_addr,$action,$PHPSESSID)
+    {
+
+        global $sqsdb;
+        if ($sqsdb->logevent($this->CustomerID, $ip_addr,$action,$PHPSESSID)) {
             return true;
         } else {
             return 0;
@@ -102,15 +111,7 @@ class sqsSession
     public function validate($type, $dirty_string)
     {
     }
-    public function logEvent($action)
-    {
-        global $sqsdb;
-        if ($sqsdb->logevent($this->CustomerID ,$action)) {
-            return true;
-        } else {
-            return 0;
-        }
-    }
+   
 
     //===========================productfunction================================================
     public function display()
@@ -119,33 +120,7 @@ class sqsSession
         $sqsdb->displayfood();
         return $sqsdb;
     }
-    public function addfood($foodname, $price, $description, $options, $image)
-    {
-        global $sqsdb;
-        if ($sqsdb->addfooditem($foodname, $price, $description, $options, $image)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    public function deleteFOOD($F_ID)
-    {
-        global $sqsdb;
-        if ($sqsdb->deletefood($F_ID)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    public function updatefood($F_ID, $foodname, $price, $description, $options, $image)
-    {
-        global $sqsdb;
-        if ($sqsdb->updatefooditem($F_ID, $foodname, $price, $description, $options, $image)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+   
     public function createorder()
     {
         global $sqsdb;
@@ -158,8 +133,9 @@ class sqsSession
     //====================orderfunction===============================
     public function displayorder()
     {
+        echo("okkk");
         global $sqsdb;
-        $sqsdb->displayorderfood();
+      $sqsdb->displayorderfood();
         return $sqsdb;
     }
     public function orderquantity($F_ID, $foodname, $price, $quantity, $totalprice)
@@ -228,39 +204,6 @@ class sqsSession
         }
         return $sqsdb;
     }
+   
 
-//==========================control user================
-function displayuser()
-{
-    global $sqsdb;
-    $sqsdb->userdisplay();
-    return $sqsdb;
-}
- function adduser($username, $email, $phone, $postcode, $password,$usertype)
-{
-    global $sqsdb;
-    if ($sqsdb->useradd($username, $email, $phone, $postcode, $password,$usertype)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-function deleteuser($CustomerID)
-{
-    global $sqsdb;
-    if ($sqsdb->userdelete($CustomerID)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-function updateuser($CustomerID, $username, $email, $phone, $postcode, $password,$usertype)
-{
-    global $sqsdb;
-    if ($sqsdb->userupdate($CustomerID, $username, $email, $phone, $postcode, $password,$usertype)) {
-        return true;
-    } else {
-        return false;
-    }
-}
 }
