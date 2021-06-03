@@ -3,8 +3,7 @@
 require_once('../vendor/autoload.php');
 require_once('./se.php');
 require_once('./userfunction.php');
-echo("hello");
-die;
+
 //sqsuser is from the userfunction.php which represent database
 $sqsdb = new sqsuser;
 
@@ -28,7 +27,8 @@ $response->headers->set('Access-Control-Allow-Credentials', 'true');
 ini_set('session.cookie_samesite',"None");
 ini_set('session.cookie_secure', "1");
 $session->start();
-
+echo("hello");
+die;
 if (!$session->has('sessionObj')) {
     $session->set('sessionObj', new sqsSession);
 }
