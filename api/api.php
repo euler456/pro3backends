@@ -16,8 +16,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 $request = Request::createFromGlobals();
-echo("fff");
-die;
 $response = new Response();
 $session = new Session(new NativeSessionStorage(), new AttributeBag());
 
