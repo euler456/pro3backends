@@ -17,15 +17,16 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 $request = Request::createFromGlobals();
 $response = new Response();
 $session = new Session(new NativeSessionStorage(), new AttributeBag());
-$originPass= false;
+echo $dbURI;
+die;
+
 $response->headers->set('Content-Type', 'application/json');
 $response->headers->set('Access-Control-Allow-Headers', 'origin, content-type, accept');
 $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 $response->headers->set('Access-Control-Allow-Origin', 'https://proj3backends.herokuapp.com');
 $response->headers->set('Access-Control-Allow-Credentials', 'true');
 //put session here because here is the place the action started
-echo $dbURI;
-die;
+
 ini_set('session.cookie_samesite',"None");
 ini_set('session.cookie_secure', "1");
 $session->start();
@@ -33,7 +34,7 @@ if (!$session->has('sessionObj')) {
     $session->set('sessionObj', new sqsSession);
 }
 
-
+$originPass= false;
 if (strpos($request->headers->get('referer'), "proj3backends") == true) {
     $originPass = true; 
 } else { 
