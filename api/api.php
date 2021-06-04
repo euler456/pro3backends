@@ -33,8 +33,7 @@ if (!$session->has('sessionObj')) {
     $session->set('sessionObj', new sqsSession);
 }
 if (empty($request->query->all())) {
-    echo("fff");
-die;
+    
     $response->setStatusCode(400);
 } 
 elseif ($request->cookies->has('PHPSESSID')) {
